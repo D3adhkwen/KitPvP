@@ -67,7 +67,6 @@
                         <configuration>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
                             <shadedArtifactAttached>false</shadedArtifactAttached>
-                            <outputFile>/Users/nico/Developer/Spigot/Latest/plugins/${project.artifactId}.jar</outputFile>
                         </configuration>
                     </execution>
                 </executions>
