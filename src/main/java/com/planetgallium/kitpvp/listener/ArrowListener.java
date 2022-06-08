@@ -101,12 +101,6 @@ public class ArrowListener implements Listener {
 			     		       
 							shooter.sendMessage(config.getString("Combat.ArrowReturn.NoSpace"));
 
-			        	} else {
-
-							shooter.getInventory().addItem(arrowToAdd);
-							shooter.getInventory().addItem(arrowToAdd);
-
-						}
 						
 					}
 						
