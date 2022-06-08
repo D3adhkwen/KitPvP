@@ -88,28 +88,29 @@ public class ArrowListener implements Listener {
 									ItemStack arrowInv = new ItemStack(Material.ARROW);
 									shooter.getInventory().addItem(arrowInv);
 									shooter.getInventory().addItem(arrowInv);
-				
+
 									return;
-									
+
 								}
 
 							}
-							
+
 						}
-						
+
 						if (shooter.getInventory().firstEmpty() == -1) {
-			     		       
+
 							shooter.sendMessage(config.getString("Combat.ArrowReturn.NoSpace"));
 
-						
+						}
+
 					}
-						
+
 				}
-				
+
 			}
-			
+
 		}
-		
+
 	}
 
 }
