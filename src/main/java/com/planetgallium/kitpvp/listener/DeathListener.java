@@ -162,6 +162,7 @@ public class DeathListener implements Listener {
 			if (config.getBoolean("Arena.ClearInventoryOnRespawn")) {
 				victim.getInventory().clear();
 				victim.getInventory().setArmorContents(null);
+				victim.setItemOnCursor(null);
 			}
 
 			new BukkitRunnable() {
