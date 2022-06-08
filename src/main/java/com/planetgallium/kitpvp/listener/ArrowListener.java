@@ -72,11 +72,22 @@ public class ArrowListener implements Listener {
 						for (ItemStack items : shooter.getInventory().getContents()) {
 							
 							if (items != null && items.getType() == XMaterial.ARROW.parseMaterial() && items.getAmount() < 64) {
-								
-								if (shooter.hasPermission("kp.arrowreturn")) {
 
-									shooter.getInventory().addItem(arrowToAdd);
-									shooter.getInventory().addItem(arrowToAdd);
+								if (shooter.hasPermission("kp.arrowreturn") && shooter != damagedPlayer) {
+
+									if (config.getBoolean("Arena.NoKitProtection")) {
+
+										if (!Game.getInstance().getArena().getKits().hasKit(damagedPlayer.getName())) {
+
+											return;
+
+										}
+
+									}
+
+									ItemStack arrowInv = new ItemStack(Material.ARROW);
+									shooter.getInventory().addItem(arrowInv);
+									shooter.getInventory().addItem(arrowInv);
 				
 									return;
 									
@@ -86,10 +97,10 @@ public class ArrowListener implements Listener {
 							
 						}
 						
-				    	if (shooter.getInventory().firstEmpty() == -1) {
+						if (shooter.getInventory().firstEmpty() == -1) {
 			     		       
-			        		shooter.sendMessage(config.getString("Combat.ArrowReturn.NoSpace"));
-			        			
+							shooter.sendMessage(config.getString("Combat.ArrowReturn.NoSpace"));
+
 			        	} else {
 
 							shooter.getInventory().addItem(arrowToAdd);
