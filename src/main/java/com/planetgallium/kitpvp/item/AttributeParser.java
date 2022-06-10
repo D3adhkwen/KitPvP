@@ -7,6 +7,7 @@ import com.planetgallium.kitpvp.Game;
 import com.planetgallium.kitpvp.util.Resource;
 import com.planetgallium.kitpvp.util.Toolkit;
 import org.bukkit.Color;
+import org.bukkit.FireworkEffect;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
@@ -134,6 +135,16 @@ public class AttributeParser {
             item.addUnsafeEnchantments(enchantments);
         }
 
+        if (resource.contains(path + ".Power")) {
+            FireworkMeta fireworkMeta = (FireworkMeta) item.getItemMeta();
+            fireworkMeta.setPower(resource.getInt(path + ".Power"));
+            item.setItemMeta(fireworkMeta);
+        }
+
+        if (resource.contains(path + ".Projectiles")) {
+            item = setChargedProjectilesFromPath(item, resource, path + ".Projectiles");
+        }
+
         return item;
     }
 
@@ -197,6 +208,10 @@ public class AttributeParser {
         String firstChildPath = path + ".Effects." + firstChildEffectName;
         boolean isCustom = resource.contains(firstChildPath + ".Duration");
 
+        if (item.getType() == XMaterial.FIREWORK_ROCKET.parseMaterial()) {
+            return setFireworkEffectsFromPath(item, resource, effectsPath);
+        }
+
         if (Toolkit.versionToNumber() == 18 && !isCustom) {
             return setVanillaEffectsFromPath(item, resource, effectsPath);
         }
@@ -249,6 +264,55 @@ public class AttributeParser {
         }
 
         item.setItemMeta(potionMeta);
+    }
+
+    private static ItemStack setFireworkEffectsFromPath(ItemStack item, Resource resource, String path) {
+        FireworkMeta fireworkMeta = (FireworkMeta) item.getItemMeta();
+
+        for (String effectNum : resource.getConfigurationSection(path).getKeys(false)) {
+            String specificPath = path + "." + effectNum;
+            Set<String> colors = Optional.ofNullable(resource.getConfigurationSection(specificPath + ".Colors"))
+                    .map(x -> x.getKeys(false))
+                    .orElse(null);
+            Set<String> fadeColors = Optional.ofNullable(resource.getConfigurationSection(specificPath + ".FadeColors"))
+                    .map(x -> x.getKeys(false))
+                    .orElse(null);
+            String typeStr = resource.getString(specificPath + ".Type");
+            boolean flicker = resource.getBoolean(specificPath + ".Flicker");
+            boolean trail = resource.getBoolean(specificPath + ".Trail");
+
+            FireworkEffect.Builder builder = FireworkEffect.builder();
+            if (colors != null) {
+                for (String colorNum : colors) {
+                    builder.withColor(Toolkit.getColorFromConfig(resource, specificPath + ".Colors." + colorNum));
+                }
+            }
+            if (fadeColors != null) {
+                for (String fadeColorNum : fadeColors) {
+                    builder.withFade(Toolkit.getColorFromConfig(resource, specificPath + ".FadeColors." + fadeColorNum));
+                }
+            }
+            if (typeStr != null) {
+                builder.with(FireworkEffect.Type.valueOf(typeStr));
+            }
+            builder.flicker(flicker);
+            builder.trail(trail);
+
+            fireworkMeta.addEffect(builder.build());
+        }
+        item.setItemMeta(fireworkMeta);
+        return item;
+    }
+
+    private static ItemStack setChargedProjectilesFromPath(ItemStack item, Resource resource, String path) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        CrossbowMeta crossbowMeta = (CrossbowMeta) item.getItemMeta();
+        for (String projectileNum : resource.getConfigurationSection(path).getKeys(false)) {
+            String specificPath = path + "." + projectileNum;
+            ItemStack projectile = getItemStackFromPath(resource, specificPath);
+            crossbowMeta.addChargedProjectile(projectile);
+        }
+        item.setItemMeta(crossbowMeta);
+        return item;
     }
 
     private static int getVanillaLevel(PotionType type, boolean isUpgraded) {
