@@ -3,12 +3,16 @@ package com.planetgallium.kitpvp.item;
 import com.cryptomorin.xseries.XMaterial;
 import com.planetgallium.kitpvp.util.Resource;
 import com.planetgallium.kitpvp.util.Toolkit;
+import org.bukkit.Color;
+import org.bukkit.FireworkEffect;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.*;
 import org.bukkit.potion.Potion;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
+
+import java.util.List;
 
 public class AttributeWriter {
 
@@ -45,6 +49,7 @@ public class AttributeWriter {
         serializePotion(resource, item, path);
         serializeEnchantments(resource, item, path);
         serializeDurability(resource, item, path);
+        serializeFireworkRocket(resource, item, path);
 
     }
 
@@ -189,6 +194,48 @@ public class AttributeWriter {
                     resource.save();
 
                 }
+
+            }
+
+        }
+
+    }
+
+    private static void serializeFireworkRocket(Resource resource, ItemStack item, String path) {
+
+        if (item.getType() == XMaterial.FIREWORK_ROCKET.parseMaterial()) {
+
+            FireworkMeta fireworkMeta = (FireworkMeta) item.getItemMeta();
+            List<FireworkEffect> effectList = fireworkMeta.getEffects();
+
+            resource.set(path + ".Power", fireworkMeta.getPower());
+
+            for (int i = 0; i < fireworkMeta.getEffectsSize(); i++) {
+
+                FireworkEffect fireworkEffect = effectList.get(i);
+                String effectPath = path + ".Effects." + i;
+
+                resource.set(effectPath + ".Type", fireworkEffect.getType().toString());
+                resource.set(effectPath + ".Flicker", fireworkEffect.hasFlicker());
+                resource.set(effectPath + ".Trail", fireworkEffect.hasTrail());
+
+                for (int j = 0; j < fireworkEffect.getColors().size(); j++) {
+                    Color color = fireworkEffect.getColors().get(j);
+                    String colorPath = effectPath + ".Colors." + j;
+                    resource.set(colorPath + ".Red", color.getRed());
+                    resource.set(colorPath + ".Green", color.getGreen());
+                    resource.set(colorPath + ".Blue", color.getBlue());
+                }
+
+                for (int j = 0; j < fireworkEffect.getFadeColors().size(); j++) {
+                    Color fadeColor = fireworkEffect.getFadeColors().get(j);
+                    String fadeColorPath = effectPath + ".FadeColors." + j;
+                    resource.set(fadeColorPath + ".Red", fadeColor.getRed());
+                    resource.set(fadeColorPath + ".Green", fadeColor.getGreen());
+                    resource.set(fadeColorPath + ".Blue", fadeColor.getBlue());
+                }
+
+                resource.save();
 
             }
 
