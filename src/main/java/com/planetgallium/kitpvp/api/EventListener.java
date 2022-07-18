@@ -7,6 +7,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
 import com.planetgallium.kitpvp.game.Arena;
@@ -23,34 +24,38 @@ public class EventListener implements Listener {
 	@EventHandler
 	public void onAbility(PlayerInteractEvent e) {
 
-		if (e.getAction() == Action.RIGHT_CLICK_AIR || e.getAction() == Action.RIGHT_CLICK_BLOCK) {
+		if (e.getHand() == EquipmentSlot.HAND) {
 
-			if (Toolkit.inArena(e.getPlayer())) {
+			if (e.getAction() == Action.RIGHT_CLICK_AIR || e.getAction() == Action.RIGHT_CLICK_BLOCK) {
 
-				Player p = e.getPlayer();
-				
-				if (arena.getKits().hasKit(p.getName())) {
+				if (Toolkit.inArena(e.getPlayer())) {
 
-					ItemStack currentItem = Toolkit.getMainHandItem(p);
-					Kit kit = arena.getKits().getKitOfPlayer(p.getName());
+					Player p = e.getPlayer();
 
-					if (currentItem.hasItemMeta() && currentItem.getItemMeta().hasDisplayName()) {
+					if (arena.getKits().hasKit(p.getName())) {
 
-						Ability ability = kit.getAbilityFromActivator(currentItem);
+						ItemStack currentItem = Toolkit.getMainHandItem(p);
+						Kit kit = arena.getKits().getKitOfPlayer(p.getName());
 
-						if (ability != null) {
-							Bukkit.getPluginManager().callEvent(new PlayerAbilityEvent(p, ability));
-							e.setCancelled(true);
+						if (currentItem.hasItemMeta() && currentItem.getItemMeta().hasDisplayName()) {
+
+							Ability ability = kit.getAbilityFromActivator(currentItem);
+
+							if (ability != null) {
+								Bukkit.getPluginManager().callEvent(new PlayerAbilityEvent(p, ability));
+								e.setCancelled(true);
+							}
+
 						}
 
-					}	
-					
+					}
+
 				}
-				
+
 			}
-			
+
 		}
-		
+
 	}
 
 }
