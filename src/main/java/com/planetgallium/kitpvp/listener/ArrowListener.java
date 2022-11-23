@@ -1,7 +1,9 @@
 package com.planetgallium.kitpvp.listener;
 
 import com.cryptomorin.xseries.XMaterial;
+import com.planetgallium.kitpvp.Game;
 import com.planetgallium.kitpvp.util.Resource;
+import com.planetgallium.kitpvp.util.Toolkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
@@ -10,9 +12,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import com.planetgallium.kitpvp.Game;
-import com.planetgallium.kitpvp.util.Toolkit;
 
 public class ArrowListener implements Listener {
 
@@ -61,32 +60,34 @@ public class ArrowListener implements Listener {
 	}
 
 	private void doArrowReturnIfEnabled(Player shooter, Player damagedPlayer) {
-		if (config.getBoolean("Combat.ArrowReturn.Enabled")) {
+		if (!config.getBoolean("Combat.ArrowReturn.Enabled")) {
+			return;
+		}
 
-			// Do not do arrow return if damagedPlayer does not have a kit (if NoKitProtection is enabled)
-			if (config.getBoolean("Arena.NoKitProtection")) {
-				if (!plugin.getArena().getKits().hasKit(damagedPlayer.getName())) {
-					return;
-				}
+		if (!shooter.hasPermission("kp.arrowreturn")) {
+			return;
+		}
+
+		// Do not do arrow return if damagedPlayer does not have a kit (if NoKitProtection is enabled)
+		if (config.getBoolean("Arena.NoKitProtection")) {
+			if (!plugin.getArena().getKits().hasKit(damagedPlayer.getName())) {
+				return;
 			}
+		}
 
-			ItemStack arrowToAdd = new ItemStack(Material.ARROW, config.getInt("Combat.ArrowReturn.Count"));
+		ItemStack arrowToAdd = new ItemStack(Material.ARROW, config.getInt("Combat.ArrowReturn.Count"));
 
-			for (ItemStack items : shooter.getInventory().getContents()) {
-				if (items != null && items.getType() == XMaterial.ARROW.parseMaterial() && items.getAmount() < 64) {
-
-					if (shooter.hasPermission("kp.arrowreturn")) {
-						shooter.getInventory().addItem(arrowToAdd);
-						return;
-					}
-				}
-			}
-
-			if (shooter.getInventory().firstEmpty() == -1) {
-				shooter.sendMessage(config.fetchString("Combat.ArrowReturn.NoSpace"));
-			} else {
+		for (ItemStack items : shooter.getInventory().getContents()) {
+			if (items != null && items.getType() == XMaterial.ARROW.parseMaterial() && items.getAmount() < 64) {
 				shooter.getInventory().addItem(arrowToAdd);
+				return;
 			}
+		}
+
+		if (shooter.getInventory().firstEmpty() == -1) {
+			shooter.sendMessage(config.fetchString("Combat.ArrowReturn.NoSpace"));
+		} else {
+			shooter.getInventory().addItem(arrowToAdd);
 		}
 	}
 
