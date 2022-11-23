@@ -125,6 +125,7 @@ public class DeathListener implements Listener {
 							victim.getInventory().clear();
 							victim.getInventory().setArmorContents(null);
 							victim.setItemOnCursor(null);
+							victim.getOpenInventory().getTopInventory().clear();
 						}
 
 						arena.addPlayer(victim, true, config.getBoolean("Arena.GiveItemsOnRespawn"));
@@ -147,6 +148,7 @@ public class DeathListener implements Listener {
 				victim.getInventory().clear();
 				victim.getInventory().setArmorContents(null);
 				victim.setItemOnCursor(null);
+				victim.getOpenInventory().getTopInventory().clear();
 			}
 
 			new BukkitRunnable() {
