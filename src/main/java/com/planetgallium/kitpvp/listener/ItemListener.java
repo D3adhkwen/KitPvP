@@ -498,6 +498,11 @@ public class ItemListener implements Listener {
 										return;
 									}
 
+									// Only give potion when witch kit is selected
+									if (!playerKit.getName().equals("Witch")) {
+										return;
+									}
+
 									shooter.getInventory().setItem(slot, potionStack);
 
 									if (abilities.getBoolean("Abilities.Witch.Message.Enabled")) {
