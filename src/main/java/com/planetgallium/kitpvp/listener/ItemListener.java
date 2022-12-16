@@ -499,7 +499,8 @@ public class ItemListener implements Listener {
 									}
 
 									// Only give potion when witch kit is selected
-									if (!playerKit.getName().equals("Witch")) {
+									Kit currentKit = arena.getKits().getKitOfPlayer(shooter.getName());
+									if (!currentKit.getName().equals("Witch")) {
 										return;
 									}
 
