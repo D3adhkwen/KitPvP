@@ -8,6 +8,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
 import com.planetgallium.kitpvp.game.Arena;
@@ -26,6 +27,7 @@ public class EventListener implements Listener {
 	@EventHandler
 	public void onAbility(PlayerInteractEvent e) {
 		if (e.getAction() == Action.RIGHT_CLICK_AIR || e.getAction() == Action.RIGHT_CLICK_BLOCK) {
+			if (e.getHand() != null && e.getHand() != EquipmentSlot.HAND) return;
 			if (Toolkit.inArena(e.getPlayer())) {
 				Player p = e.getPlayer();
 
