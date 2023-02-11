@@ -91,7 +91,7 @@ public class ItemListener implements Listener {
 						&& interactedItem.hasItemMeta()) {
 				archerAbility(e, p, interactedItem, interactedItemMeta);
 
-			} else if (Toolkit.hasMatchingMaterial(interactedItem, "TNT")) {
+			} else if (Toolkit.hasMatchingMaterial(interactedItem, "REPEATER")) {
 				specialTNT(e, p, interactedItem);
 
 			}
