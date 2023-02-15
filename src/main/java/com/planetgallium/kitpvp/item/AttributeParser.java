@@ -279,7 +279,7 @@ public class AttributeParser {
             Set<String> fadeColors = Optional.ofNullable(resource.getConfigurationSection(specificPath + ".FadeColors"))
                     .map(x -> x.getKeys(false))
                     .orElse(null);
-            String typeStr = resource.getString(specificPath + ".Type");
+            String typeStr = resource.fetchString(specificPath + ".Type");
             boolean flicker = resource.getBoolean(specificPath + ".Flicker");
             boolean trail = resource.getBoolean(specificPath + ".Trail");
 
