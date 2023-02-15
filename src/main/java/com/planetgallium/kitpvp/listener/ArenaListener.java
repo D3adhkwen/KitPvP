@@ -4,6 +4,7 @@ import com.cryptomorin.xseries.XMaterial;
 import com.planetgallium.kitpvp.Game;
 import com.planetgallium.kitpvp.util.Resource;
 import org.bukkit.GameMode;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -13,15 +14,14 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.hanging.HangingBreakEvent;
-import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerItemDamageEvent;
-import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.event.weather.WeatherChangeEvent;
 import com.planetgallium.kitpvp.game.Arena;
 import com.planetgallium.kitpvp.util.Resources;
 import com.planetgallium.kitpvp.util.Toolkit;
+import org.bukkit.inventory.ItemStack;
 
 public class ArenaListener implements Listener {
 	
@@ -65,6 +65,60 @@ public class ArenaListener implements Listener {
 		
 		if (Toolkit.inArena(p) && config.getBoolean("Arena.PreventItemDropping")) {
 			e.setCancelled(!p.hasPermission("kp.arena.itemdropping"));
+		}
+	}
+
+	@EventHandler
+	public void onClickItem(InventoryClickEvent e) {
+		if (!config.getBoolean("Arena.PreventMovingItemsGiven")) {
+			return;
+		}
+
+		ItemStack interactedItem = e.getCurrentItem();
+
+		if (interactedItem == null) {
+			return;
+		}
+
+		ConfigurationSection items = config.getConfigurationSection("Items");
+
+		for (String identifier : items.getKeys(false)) {
+			String itemPath = "Items." + identifier;
+			String itemMaterialName = config.fetchString(itemPath + ".Material");
+
+			if (Toolkit.hasMatchingMaterial(interactedItem, itemMaterialName)) {
+				if (Toolkit.hasMatchingDisplayName(interactedItem, config.fetchString(itemPath + ".Name"))) {
+					e.setCancelled(true);
+					return;
+				}
+			}
+		}
+	}
+
+	@EventHandler
+	public void onSwapHandItem(PlayerSwapHandItemsEvent e) {
+		if (!config.getBoolean("Arena.PreventMovingItemsGiven")) {
+			return;
+		}
+
+		ItemStack interactedItem = e.getOffHandItem();
+
+		if (interactedItem == null) {
+			return;
+		}
+
+		ConfigurationSection items = config.getConfigurationSection("Items");
+
+		for (String identifier : items.getKeys(false)) {
+			String itemPath = "Items." + identifier;
+			String itemMaterialName = config.fetchString(itemPath + ".Material");
+
+			if (Toolkit.hasMatchingMaterial(interactedItem, itemMaterialName)) {
+				if (Toolkit.hasMatchingDisplayName(interactedItem, config.fetchString(itemPath + ".Name"))) {
+					e.setCancelled(true);
+					return;
+				}
+			}
 		}
 	}
 	
