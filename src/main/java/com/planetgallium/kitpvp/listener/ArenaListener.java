@@ -4,6 +4,7 @@ import com.cryptomorin.xseries.XMaterial;
 import com.planetgallium.kitpvp.Game;
 import com.planetgallium.kitpvp.util.Resource;
 import org.bukkit.GameMode;
+import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
@@ -14,6 +15,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.hanging.HangingBreakEvent;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
@@ -76,8 +78,15 @@ public class ArenaListener implements Listener {
 
 		ItemStack interactedItem = e.getCurrentItem();
 
-		if (interactedItem == null) {
-			return;
+		if (interactedItem == null || Material.AIR == interactedItem.getType()) {
+			if (e.getClick() == ClickType.NUMBER_KEY) {
+				interactedItem = e.getClickedInventory().getItem(e.getHotbarButton());
+				if (interactedItem == null) {
+					return;
+				}
+			} else {
+				return;
+			}
 		}
 
 		ConfigurationSection items = config.getConfigurationSection("Items");
