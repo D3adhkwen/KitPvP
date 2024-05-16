@@ -4,6 +4,8 @@ import com.cryptomorin.xseries.XMaterial;
 import com.planetgallium.kitpvp.Game;
 import com.planetgallium.kitpvp.util.Resource;
 import org.bukkit.GameMode;
+import org.bukkit.Material;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -13,12 +15,16 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.hanging.HangingBreakEvent;
+import org.bukkit.event.inventory.ClickType;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
+import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.event.weather.WeatherChangeEvent;
+import org.bukkit.inventory.ItemStack;
 import com.planetgallium.kitpvp.game.Arena;
 import com.planetgallium.kitpvp.util.Resources;
 import com.planetgallium.kitpvp.util.Toolkit;
@@ -67,7 +73,46 @@ public class ArenaListener implements Listener {
 			e.setCancelled(!p.hasPermission("kp.arena.itemdropping"));
 		}
 	}
-	
+
+	@EventHandler
+	public void onClickItem(InventoryClickEvent e) {
+		if (!config.getBoolean("Arena.PreventMovingItemsGiven")) {
+			return;
+		}
+		ItemStack interactedItem = e.getCurrentItem();
+		if ((interactedItem == null || Material.AIR == interactedItem.getType()) && e.getClick() == ClickType.NUMBER_KEY) {
+			interactedItem = e.getClickedInventory().getItem(e.getHotbarButton());
+		}
+		if (interactedItem != null && isPluginItem(interactedItem)) {
+			e.setCancelled(true);
+		}
+	}
+
+	@EventHandler
+	public void onSwapHandItem(PlayerSwapHandItemsEvent e) {
+		if (!config.getBoolean("Arena.PreventMovingItemsGiven")) {
+			return;
+		}
+		ItemStack interactedItem = e.getOffHandItem();
+		if (interactedItem != null && isPluginItem(interactedItem)) {
+			e.setCancelled(true);
+		}
+	}
+
+	private boolean isPluginItem(ItemStack item) {
+		ConfigurationSection items = config.getConfigurationSection("Items");
+
+		for (String identifier : items.getKeys(false)) {
+			String itemPath = "Items." + identifier;
+			String itemMaterialName = config.fetchString(itemPath + ".Material");
+
+			if (Toolkit.hasMatchingMaterial(item, itemMaterialName) && Toolkit.hasMatchingDisplayName(item, config.fetchString(itemPath + ".Name"))) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	@EventHandler
 	public void onHunger(FoodLevelChangeEvent e) {
 		Player p = (Player) e.getEntity();
