@@ -71,8 +71,14 @@ public class ArenaListener implements Listener {
 	@EventHandler
 	public void onHunger(FoodLevelChangeEvent e) {
 		Player p = (Player) e.getEntity();
-		
-		if (Toolkit.inArena(p) && config.getBoolean("Arena.PreventHunger")) {
+
+		if (!Toolkit.inArena(p)) {
+			return;
+		}
+
+		if (config.getBoolean("Arena.PreventHunger")) {
+			e.setCancelled(true);
+		} else if (config.getBoolean("Arena.NoKitPreventHunger") && !arena.getKits().playerHasKit(p.getName())) {
 			e.setCancelled(true);
 		}
 	}
