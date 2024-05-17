@@ -44,6 +44,14 @@ public class MenuListener implements Listener {
                 }
             }
 
+            if (e.getClick() == ClickType.NUMBER_KEY || e.getClick() == ClickType.SWAP_OFFHAND) {
+                if (clickedInventory.getHolder() instanceof KitHolder ||
+                        clickedInventory.getHolder() instanceof PreviewHolder) {
+                    e.setCancelled(true);
+                    return;
+                }
+            }
+
             if (e.getClickedInventory().getHolder() instanceof KitHolder) {
 
                 Inventory openMenu = e.getClickedInventory();
